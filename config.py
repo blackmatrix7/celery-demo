@@ -34,29 +34,29 @@ class CommonConfig(BaseConfig):
     CELERYD_CONCURRENCY = 3
     # 为Task指定不同的队列
     CELERY_QUEUES = (
-        Queue('send_mail', routing_key='vcan.send_mail'),
-        Queue('vcan_health_schedules', routing_key='vcan.health.schedules'),
+        Queue('email_queue', routing_key='email_router'),
+        Queue('message_queue', routing_key='message_router'),
     )
     CELERY_ROUTES = {
-        'toolkit.vmail.async_send_mail': {
-            'queue': 'send_mail',
-            'routing_key': 'vcan.send_mail',
+        'handlers.async_task.async_send_email': {
+            'queue': 'email_queue',
+            'routing_key': 'vcan.email_router',
         },
-        'apps.marketing.marketing.schedules.async_push_ext_contacts': {
-            'queue': 'vcan_health_schedules',
-            'routing_key': 'vcan.health.schedules',
+        'handlers.async_task.async_push_message': {
+            'queue': 'message_queue',
+            'routing_key': 'message_router',
         }
     }
     # Celery 时区，定时任务需要
     CELERY_TIMEZONE = 'Asia/Shanghai'
     # 定时任务 schedules
     CELERYBEAT_SCHEDULE = {
-        'every-one-hour': {
-             'task': 'apps.marketing.marketing.schedules.async_push_ext_contacts',
+        'every-30-seconds': {
+             'task': 'handlers.schedules.schedule_function',
              # 每 30 秒执行一次
-             'schedule': timedelta(seconds=3600),
+             'schedule': timedelta(seconds=30),
              # 任务函数参数
-             'args': None
+             'args': {'value': '2333333'}
         }
     }
 

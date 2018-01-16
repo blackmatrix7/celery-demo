@@ -26,5 +26,18 @@ def async_send_email(send_from, send_to, subject, content):
     # 休眠
     sleep(5)
 
+
+def async_push_message(send_to, content):
+    """
+    模拟异步推送消息
+    :param send_to:
+    :param content:
+    :return:
+    """
+    logging.info('模拟异步推送消息')
+    logging.info(send_to, content)
+    # 休眠
+    sleep(5)
+
 if __name__ == '__main__':
     pass

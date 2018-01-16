@@ -32,11 +32,12 @@ class CommonConfig(BaseConfig):
     CELERY_IMPORTS = ('handlers.async_task', 'handlers.schedules')
     # celery worker 的并发数
     CELERYD_CONCURRENCY = 3
-    # 为Task指定不同的队列
+    # 创建多个队列，及对应的交换机
     CELERY_QUEUES = (
         Queue('email_queue', routing_key='email_router'),
         Queue('message_queue', routing_key='message_router'),
     )
+    # 为不同的task指派不同的队列
     CELERY_ROUTES = {
         'handlers.async_task.async_send_email': {
             'queue': 'email_queue',
@@ -52,7 +53,7 @@ class CommonConfig(BaseConfig):
     # 定时任务 schedules
     CELERYBEAT_SCHEDULE = {
         'every-30-seconds': {
-             'task': 'handlers.schedules.schedule_function',
+             'task': 'handlers.schedules.every_30_seconds',
              # 每 30 秒执行一次
              'schedule': timedelta(seconds=30),
              # 任务函数参数

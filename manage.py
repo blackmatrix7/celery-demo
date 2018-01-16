@@ -39,7 +39,11 @@ def runbeat():
 
 
 def schedules():
-    celery.start(argv=['celery', 'worker', '-Q', 'vcan_health_schedules', '-l', 'info', '-f', 'logs/schedules.log'])
+    """
+    与runcelery的唯一区别是增加了-Q的参数，用于指定队列名称
+    :return:
+    """
+    celery.start(argv=['celery', 'worker', '-Q', 'schedules', '-l', 'info', '-f', 'logs/schedules.log'])
 
 
 if __name__ == '__main__':

@@ -36,6 +36,7 @@ class CommonConfig(BaseConfig):
     CELERY_QUEUES = (
         Queue('email_queue', routing_key='email_router'),
         Queue('message_queue', routing_key='message_router'),
+        Queue('schedules_queue', routing_key='schedules_router'),
     )
     # 为不同的task指派不同的队列
     CELERY_ROUTES = {
@@ -46,6 +47,10 @@ class CommonConfig(BaseConfig):
         'handlers.async_task.async_push_message': {
             'queue': 'message_queue',
             'routing_key': 'message_router',
+        },
+        'handlers.schedules.every_30_seconds': {
+            'queue': 'schedules_queue',
+            'routing_key': 'schedules_router',
         }
     }
     # Celery 时区，定时任务需要

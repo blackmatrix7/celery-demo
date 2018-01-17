@@ -37,7 +37,7 @@ def async_push_message(send_to, content):
     logging.info('模拟异步推送消息')
     logging.info(send_to, content)
     # 休眠
-    sleep(5)
+    sleep(10)
 
 if __name__ == '__main__':
     pass

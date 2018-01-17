@@ -41,14 +41,31 @@ def runbeat():
 def schedules():
     """
     与runcelery的唯一区别是增加了-Q的参数，用于指定队列名称
+    当然还有输出日志文件的区别
     :return:
     """
-    celery.start(argv=['celery', 'worker', '-Q', 'schedules', '-l', 'info', '-f', 'logs/schedules.log'])
+    celery.start(argv=['celery', 'worker', '-Q', 'schedules_queue', '-l', 'info', '-f', 'logs/schedules.log'])
+
+
+def send_email():
+    """
+    发送邮件worker
+    与runcelery的唯一区别是增加了-Q的参数，用于指定队列名称
+    当然还有输出日志文件的区别
+    :return:
+    """
+    celery.start(argv=['celery', 'worker', '-Q', 'email_queue', '-l', 'info', '-f', 'logs/email.log'])
+
+
+def push_message():
+    """
+    推送消息worker
+    :return:
+    """
+    celery.start(argv=['celery', 'worker', '-Q', 'message_queue', '-l', 'info', '-f', 'logs/message.log'])
 
 
 if __name__ == '__main__':
-
-    logger.info('config name: {}'.format(cmdline.config))
 
     cmds = {
         # 启动celery
@@ -57,4 +74,4 @@ if __name__ == '__main__':
         'schedules': schedules,
         # 启动celery beat
         'runbeat': runbeat,
-    }.get(cmdline.command, 'runcelery')()
+    }.get(cmdline.config, 'runcelery')()

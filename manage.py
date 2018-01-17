@@ -6,6 +6,7 @@
 # @Blog : http://www.cnblogs.com/blackmatrix/
 # @File : manager.py.py
 # @Software: PyCharm
+import os
 import logging.config
 from celery import Celery
 from config import current_config
@@ -13,12 +14,26 @@ from toolkit.cmdline import cmdline
 
 __author__ = 'blackmatrix'
 
-# 实例化一个celery对象
-celery = Celery('apizen',  broker=current_config.CELERY_BROKER_URL)
-celery.config_from_object('config.current_config')
+
+# 为了使用方便，在这里引入了之前写的config模块（支持本地配置不提交到github）
+# 本身是非必须的，用dict存储celery配置一样可以
+# 所以在这里以注释的形式，增加一个不适用config模块的实现
+
+# 等价于直接定义一个broker，如
+# broker = 'amqp://user:password@127.0.0.1:5672//'
+broker = current_config.CELERY_BROKER_URL
+# 将config模块的配置转换成dict，等价于直接通过dict定义一组celery配置
+celery_conf = {k: v for k, v in current_config.items()}
+
+# 创建celery实例
+celery = Celery('demo',  broker=broker)
+# 如果使用config模块，可以：
+# celery.config_from_object('config.current_config')
+# 使用dict的情况下，直接把dict作为参数传递给config_from_object
+celery.config_from_object(celery_conf)
 
 # 日志
-logging.config.fileConfig('logging.cfg', disable_existing_loggers=False)
+logging.config.fileConfig(os.path.abspath('logging.cfg'), disable_existing_loggers=False)
 logger = logging.getLogger('root')
 
 
@@ -72,6 +87,8 @@ if __name__ == '__main__':
         'runcelery': runcelery,
         # 根据task启动不同的worker
         'schedules': schedules,
+        'push_message': push_message,
+        'send_email': send_email,
         # 启动celery beat
         'runbeat': runbeat,
-    }.get(cmdline.config, 'runcelery')()
+    }.get(cmdline.command, 'runcelery')()

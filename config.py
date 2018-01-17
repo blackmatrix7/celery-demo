@@ -13,15 +13,12 @@ from toolkit.config import BaseConfig, get_current_config
 __author__ = 'blackmatrix'
 
 
-# 读取配置文件的名称，在具体的应用中，可以从环境变量、命令行参数等位置获取配置文件名称
-config_name = 'default'
-current_config = get_current_config(config_name)
-
-
 class CommonConfig(BaseConfig):
 
-    # Celery
+    # Celery 配置
+    # broker 推荐 rabbitmq
     CELERY_BROKER_URL = 'amqp://user:password@127.0.0.1:5672//'
+    # backend 用于存储数据，推荐redis
     CELERY_RESULT_BACKEND = 'amqp://user:password@127.0.0.1:5672//'
     CELERY_ACCEPT_CONTENT = ['json', 'pickle']
     CELERY_TASK_SERIALIZER = 'json'
@@ -29,22 +26,22 @@ class CommonConfig(BaseConfig):
     CELERY_REDIRECT_STDOUTS_LEVEL = 'INFO'
     CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
     # 导入Task所在的模块
-    CELERY_IMPORTS = ('handlers.async_task', 'handlers.schedules')
+    CELERY_IMPORTS = ('handlers.async_tasks', 'handlers.schedules')
     # celery worker 的并发数
     CELERYD_CONCURRENCY = 3
     # 创建多个队列，及对应的交换机
     CELERY_QUEUES = (
-        Queue('email_queue', routing_key='email_router'),
-        Queue('message_queue', routing_key='message_router'),
-        Queue('schedules_queue', routing_key='schedules_router'),
+        Queue(name='email_queue', routing_key='email_router'),
+        Queue(name='message_queue', routing_key='message_router'),
+        Queue(name='schedules_queue', routing_key='schedules_router'),
     )
     # 为不同的task指派不同的队列
     CELERY_ROUTES = {
-        'handlers.async_task.async_send_email': {
+        'handlers.async_tasks.async_send_email': {
             'queue': 'email_queue',
             'routing_key': 'vcan.email_router',
         },
-        'handlers.async_task.async_push_message': {
+        'handlers.async_tasks.async_push_message': {
             'queue': 'message_queue',
             'routing_key': 'message_router',
         },
@@ -70,8 +67,12 @@ class CommonConfig(BaseConfig):
 class DefaultConfig(CommonConfig):
     pass
 
-defcfg = DefaultConfig()
+default = DefaultConfig()
 
 configs = {
-    'default': defcfg
+    'default': default
 }
+
+# 读取配置文件的名称，在具体的应用中，可以从环境变量、命令行参数等位置获取配置文件名称
+config_name = 'default'
+current_config = get_current_config(config_name)

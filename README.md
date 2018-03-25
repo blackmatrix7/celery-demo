@@ -14,22 +14,19 @@
 
 在这里列出一些比较常用的Celery配置项：
 
-| 配置项名称                    | 说明                            |
-| ------------------------ | ----------------------------- |
+| 配置项名称               | 说明                                                   |
+| ------------------------ | ------------------------------------------------------ |
 | CELERY_DEFAULT_QUEUE     | 默认的队列名称，当没有为task特别指定队列时，采用此队列 |
-| CELERY_BROKER_URL        | 消息代理，用于发布者传递消息给消费者，推荐RabbitMQ |
-| CELERY_RESULT_BACKEND    | 后端，用于存储任务执行结果，推荐redis         |
-| CELERY_TASK_SERIALIZER   | 任务的序列化方式                      |
-| CELERY_RESULT_SERIALIZER | 任务执行结果的序列化方式                  |
-| CELERY_ACCEPT_CONTENT    |                               |
-| CELERYD_CONCURRENCY      | 任务消费者的并发数                     |
-| CELERY_TIMEZONE          | 时区设置，计划任务需要，推荐 Asia/Shanghai  |
-| CELERY_QUEUES            | Celery队列设定                    |
-| CELERY_ROUTES            | Celery路由设定，用于给不同的任务指派不同的队列    |
-| CELERYBEAT_SCHEDULE      | Celery计划任务设定                  |
-|                          |                               |
-|                          |                               |
-|                          |                               |
+| CELERY_BROKER_URL        | 消息代理，用于发布者传递消息给消费者，推荐RabbitMQ     |
+| CELERY_RESULT_BACKEND    | 后端，用于存储任务执行结果，推荐redis                  |
+| CELERY_TASK_SERIALIZER   | 任务的序列化方式                                       |
+| CELERY_RESULT_SERIALIZER | 任务执行结果的序列化方式                               |
+| CELERY_ACCEPT_CONTENT    |                                                        |
+| CELERYD_CONCURRENCY      | 任务消费者的并发数                                     |
+| CELERY_TIMEZONE          | 时区设置，计划任务需要，推荐 Asia/Shanghai             |
+| CELERY_QUEUES            | Celery队列设定                                         |
+| CELERY_ROUTES            | Celery路由设定，用于给不同的任务指派不同的队列         |
+| CELERYBEAT_SCHEDULE      | Celery计划任务设定                                     |
 
 *为了使用方便，在这里引入了之前写的[config模块](https://github.com/blackmatrix7/matrix-toolkit/blob/master/toolkit/config.py)（支持本地配置不提交到github），本身是非必须的，用dict存储celery配置一样可以。所以在下面的示例代码中，会以注释的形式，演示不使用config模块实现celery配置。*
 
@@ -50,6 +47,7 @@ manage.py
 ```python
 # 创建celery实例
 celery = Celery('demo',  broker=broker)
+# 载入celery配置
 celery.config_from_object(celery_conf)
 ```
 
@@ -63,11 +61,13 @@ celery.config_from_object(celery_conf)
 
 ## QuickStart
 
-### 启动celery worker
+### 创建celery worker
 
-推荐以celery.start的方式来启动celery，具体的实现：
+推荐以celery.start的方式来启动celery
 
-在创建完celery实例后，调用celery实例的方法，来启动celery。
+#### 基础启动参数
+
+在创建完celery实例后，调用celery实例的start方法，来启动celery。
 
 ```python
 celery = Celery('demo',  broker=broker)
@@ -83,6 +83,16 @@ celery.start(argv=['celery', 'worker', '-l', 'info', '-f', 'logs/celery.log'])
 第三个参数和第四个参数为一组，指定日志的级别，这里记录级别为info的日子
 
 第五个参数和第六个参数为一组，指定日志文件的位置，这里将日志记录在log/celery.log
+
+#### 指定消费的队列
+
+在启动命令中，增加一个-Q的参数，用于指定消费的队列。
+
+```python
+celery.start(argv=['celery', 'worker', '-Q', 'message_queue', '-l', 'info', '-f', 'logs/message.log'])
+```
+
+上述的参数中，'-Q', 'message_queue'两个参数，是指定这个worker消费名为“message_queue”的队列。
 
 ### 异步执行任务
 

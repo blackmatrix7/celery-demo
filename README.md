@@ -69,6 +69,8 @@ celery.config_from_object(celery_conf)
 
 在创建完celery实例后，调用celery实例的start方法，来启动celery。
 
+*在demo中，在manage.py中创建celery实例。*
+
 ```python
 celery = Celery('demo',  broker=broker)
 celery.config_from_object(celery_conf)
@@ -93,6 +95,23 @@ celery.start(argv=['celery', 'worker', '-Q', 'message_queue', '-l', 'info', '-f'
 ```
 
 上述的参数中，'-Q', 'message_queue'两个参数，是指定这个worker消费名为“message_queue”的队列。
+
+### 创建异步任务
+
+对于需要在celery中异步执行的函数，只需要在函数上增加一个装饰器。
+
+```python
+# 导入manage.py中创建的celery实例
+from manage import celery
+
+# 需要在celery中异步执行的函数，增加celery.task装饰器
+@celery.task
+def async_send_email(send_from, send_to, subject, content):
+    """
+    忽略方法实现
+    """
+    pass
+```
 
 ### 异步执行任务
 

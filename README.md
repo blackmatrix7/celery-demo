@@ -115,67 +115,23 @@ def async_send_email(send_from, send_to, subject, content):
 
 ### 异步执行任务
 
-以模拟异步发送邮件为例
+对于以celery.task装饰的函数，可以同步运行，也可以异步运行。
 
-启动worker
+接上一个例子的async_send_email函数。
 
-```
-python manage.py push_message
-python manage.py send_email
-```
-
-运行单元测试
-
-```
-python tests/test_celery.py
-```
-
-测试用例一，同步执行，直接由单元测试模块执行task。
-
-从输出的日志上，可以看到task是以此完成的，每个task休眠10秒
+同步执行时，直接调用这个函数即可。
 
 ```python
-def test_push_message():
-    """
-    直接调用推送消息的task，task同步执行
-    从tests/logs/manage.log来看，任务一次执行，第一次执行后休眠10秒执行下一个任务
-    2018/01/17 14:37:03 - root - INFO - 模拟异步推送消息 - [async_tasks.py:40]
-    2018/01/17 14:37:03 - root - INFO - send_to: ['张三', '李四'] - [async_tasks.py:41]
-    2018/01/17 14:37:03 - root - INFO - content: 老板喊你来背锅了 - [async_tasks.py:42]
-    2018/01/17 14:37:13 - root - INFO - 模拟异步推送消息 - [async_tasks.py:40]
-    2018/01/17 14:37:13 - root - INFO - send_to: ['刘五', '赵六'] - [async_tasks.py:41]
-    2018/01/17 14:37:13 - root - INFO - content: 老板喊你来领奖金了 - [async_tasks.py:42]
-    :return:
-    """
-    from handlers.async_tasks import async_push_message
-    async_push_message(send_to=['张三', '李四'], content='老板喊你来背锅了')
-    async_push_message(send_to=['刘五', '赵六'], content='老板喊你来领奖金了')
+async_push_message(send_to=['张三', '李四'], content='老板喊你来背锅了')
+async_push_message(send_to=['刘五', '赵六'], content='老板喊你来领奖金了')
 ```
 
-测试用例二，通过delay调用celery的task, task将异步执行；将task交由celery执行，并输出日志到logs/message.log。
-
-从输出日志上，可以看到task几乎是同时启动，同步完成的，并不受到task内sleep(10)的影响。
+需要异步执行时，调用函数的delay()方法执行，此时会将任务委托给celery后台的worker执行。
 
 ```python
-def test_async_push_message():
-    """
-    测试前，请确保push_message的worker已经正常启动
-    通过delay调用celery的task, task将异步执行
-    从logs/message.log来看，基本上是同时执行，同时完成
-    [2018-01-17 14:34:28,151: INFO/ForkPoolWorker-4] 模拟异步推送消息
-    [2018-01-17 14:34:28,153: INFO/ForkPoolWorker-4] send_to: ['张三', '李四']
-    [2018-01-17 14:34:28,154: INFO/ForkPoolWorker-4] content: 老板喊你来背锅了
-    [2018-01-17 14:34:28,154: INFO/ForkPoolWorker-1] 模拟异步推送消息
-    [2018-01-17 14:34:28,156: INFO/ForkPoolWorker-1] send_to: ['刘五', '赵六']
-    [2018-01-17 14:34:28,158: INFO/ForkPoolWorker-1] content: 老板喊你来领奖金了
-    :return:
-    """
-    from handlers.async_tasks import async_push_message
-    async_push_message.delay(send_to=['张三', '李四'], content='老板喊你来背锅了')
-    async_push_message.delay(send_to=['刘五', '赵六'], content='老板喊你来领奖金了')
+async_push_message.delay(send_to=['张三', '李四'], content='老板喊你来背锅了')
+async_push_message.delay(send_to=['刘五', '赵六'], content='老板喊你来领奖金了')
 ```
-
-这样初步的异步执行就已经实现，异步的task不会阻塞主进程。
 
 ### 为任务指定不同队列
 

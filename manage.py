@@ -75,6 +75,7 @@ def send_email():
 def push_message():
     """
     推送消息worker
+    与runcelery的唯一区别是增加了-Q的参数，用于指定队列名称
     :return:
     """
     celery.start(argv=['celery', 'worker', '-Q', 'message_queue', '-l', 'info', '-f', 'logs/message.log'])

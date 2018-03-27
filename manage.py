@@ -76,6 +76,7 @@ def push_message():
     """
     推送消息worker
     与runcelery的唯一区别是增加了-Q的参数，用于指定队列名称
+    当然还有输出日志文件的区别
     :return:
     """
     celery.start(argv=['celery', 'worker', '-Q', 'message_queue', '-l', 'info', '-f', 'logs/message.log'])

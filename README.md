@@ -59,13 +59,11 @@ celery.config_from_object(celery_conf)
 
 异步任务下有两个函数，模拟发送邮件和推送消息；计划任务下有数个根据计划任务执行事件定义的模拟函数。
 
-## QuickStart
-
-### 创建celery worker
+## 创建celery worker
 
 推荐以celery.start的方式来启动celery
 
-#### 基础启动参数
+#### 启动参数
 
 在创建完celery实例后，调用celery实例的start方法，来启动celery。
 
@@ -178,3 +176,45 @@ CELERY_ROUTES = {
 
 配置完成后，不同的task会根据CELERY_ROUTES的设置，指派到不同的消息队列。
 
+## 计划任务
+
+celery除用于异步执行任务外，还可以用于执行计划任务。
+
+### 设定celery时区
+
+在开始配置计划任务之前对配置文件中设定celery时区。
+
+```python
+# 设定 Celery 时区
+CELERY_TIMEZONE = 'Asia/Shanghai'
+```
+
+### 定义计划任务
+
+celery可以通过多种方式定义计划任务，如在配置文件中，通过代码动态添加等等。
+
+#### 在配置文件中定义计划任务
+
+在配置文件中，新增一项CELERYBEAT_SCHEDULE的配置
+
+```python
+CELERYBEAT_SCHEDULE = {
+	# 给计划任务取一个独一无二的名字吧
+    'every-30-seconds': {
+    	# task就是需要执行计划任务的函数
+         'task': 'handlers.schedules.every_30_seconds',
+         # 配置计划任务的执行时间，这里是每 30 秒执行一次
+         'schedule': timedelta(seconds=30),
+         # 传入给计划任务函数的参数
+         'args': {'value': '2333333'}
+    }
+}
+```
+
+CELERYBEAT_SCHEDULE是一个dict，每个key为计划任务的名称，value也是dict，包含task、schedule、args。
+
+task即需要执行计划任务的函数，这里是`handlers.schedules.every_30_seconds`，即handlers的schedules的every_30_seconds函数，如需配置其他的函数，依照此规则定义即可。
+
+args是传递给计划任务函数的参数，在这个例子中，即传递给every_30_seconds的参数，如果无需参数，则args配置为None。
+
+schedule即配置计划任务的执行时间，可以间隔某些时间执行，也可以指定某个时间点执行或重复某个时间点执行。

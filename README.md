@@ -198,12 +198,15 @@ celery可以通过多种方式定义计划任务，如在配置文件中，通�
 在配置文件中，新增一项CELERYBEAT_SCHEDULE的配置
 
 ```python
+from datetime import timedelta
+from celery.schedules import crontab
+
 CELERYBEAT_SCHEDULE = {
 	# 给计划任务取一个独一无二的名字吧
     'every-30-seconds': {
     	# task就是需要执行计划任务的函数
          'task': 'handlers.schedules.every_30_seconds',
-         # 配置计划任务的执行时间，这里是每 30 秒执行一次
+         # 配置计划任务的执行时间，这里是每30秒执行一次
          'schedule': timedelta(seconds=30),
          # 传入给计划任务函数的参数
          'args': {'value': '2333333'}
@@ -217,4 +220,35 @@ task即需要执行计划任务的函数，这里是`handlers.schedules.every_30
 
 args是传递给计划任务函数的参数，在这个例子中，即传递给every_30_seconds的参数，如果无需参数，则args配置为None。
 
-schedule即配置计划任务的执行时间，可以间隔某些时间执行，也可以指定某个时间点执行或重复某个时间点执行。
+schedule即配置计划任务的执行时间，例子中使用的是timedelta实例，用于实现固定间隔某些时间执行。除此之外，还可以设定某个时间点执行，或重复某个时间点执行。这个就需要用到celery的crontab类。
+
+```python
+'push_occupancy_rates': {
+            'task': 'handlers.schedules.test_func_b',
+            # 每天中午12点执行
+            'schedule': crontab(hour='12', minute='0'),
+            'args': None
+        },
+```
+
+关于crontab更详细的配置方式，可以参考官方手册：
+
+| **Example**                                                  | **Meaning**                                                  |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| `crontab()`                                                  | Execute every minute.                                        |
+| `crontab(minute=0, hour=0)`                                  | Execute daily at midnight.                                   |
+| `crontab(minute=0, hour='*/3')`                              | Execute every three hours: midnight, 3am, 6am, 9am, noon, 3pm, 6pm, 9pm. |
+| `crontab(minute=0, hour='0,3,6,9,12,15,18,21')`              | Same as previous.                                            |
+| `crontab(minute='*/15')`                                     | Execute every 15 minutes.                                    |
+| `crontab(day_of_week='sunday')`                              | Execute every minute (!) at Sundays.                         |
+| `crontab(minute='*', hour='*', day_of_week='sun')`           | Same as previous.                                            |
+| `crontab(minute='*/10', hour='3,17,22', day_of_week='thu,fri')` | Execute every ten minutes, but only between 3-4 am, 5-6 pm, and 10-11 pm on Thursdays or Fridays. |
+| `crontab(minute=0,hour='*/2,*/3')`                           | Execute every even hour, and every hour divisible by three. This means: at every hour *except*: 1am, 5am, 7am, 11am, 1pm, 5pm, 7pm, 11pm |
+| `crontab(minute=0, hour='*/5')`                              | Execute hour divisible by 5. This means that it is triggered at 3pm, not 5pm (since 3pm equals the 24-hour clock value of “15”, which is divisible by 5). |
+| `crontab(minute=0,hour='*/3,8-17')`                          | Execute every hour divisible by 3, and every hour during office hours (8am-5pm). |
+| `crontab(0, 0,day_of_month='2')`                             | Execute on the second day of every month.                    |
+| `crontab(0, 0, day_of_month='2-30/3')`                       | Execute on every even numbered day.                          |
+| `crontab(0, 0, day_of_month='1-7,15-21')`                    | Execute on the first and third weeks of the month.           |
+| `crontab(0, 0,day_of_month='11', month_of_year='5')`         | Execute on the eleventh of May every year.                   |
+| `crontab(0, 0, month_of_year='*/3')`                         | Execute on the first month of every quarter.                 |
+

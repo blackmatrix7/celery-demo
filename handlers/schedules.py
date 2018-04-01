@@ -11,8 +11,9 @@ import logging
 __author__ = 'blackmatrix'
 
 
-def every_30_seconds(value):
-    logging.info('every_30_seconds({value})'.format(value=value))
+def test_func_a(value):
+    logging.info(value)
 
-if __name__ == '__main__':
+
+def test_func_b():
     pass

@@ -45,7 +45,11 @@ class CommonConfig(BaseConfig):
             'queue': 'message_queue',
             'routing_key': 'message_router',
         },
-        'handlers.schedules.every_30_seconds': {
+        'handlers.schedules.test_func_a': {
+            'queue': 'schedules_queue',
+            'routing_key': 'schedules_router',
+        },
+        'handlers.schedules.test_func_b': {
             'queue': 'schedules_queue',
             'routing_key': 'schedules_router',
         }
@@ -55,7 +59,7 @@ class CommonConfig(BaseConfig):
     # 定时任务 schedules
     CELERYBEAT_SCHEDULE = {
         'every-30-seconds': {
-             'task': 'handlers.schedules.every_30_seconds',
+             'task': 'handlers.schedules.test_func_a',
              # 每 30 秒执行一次
              'schedule': timedelta(seconds=30),
              # 任务函数参数

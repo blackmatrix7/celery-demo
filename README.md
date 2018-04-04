@@ -195,6 +195,8 @@ celery可以通过多种方式定义计划任务，如在配置文件中，通�
 
 #### 在配置文件中定义计划任务
 
+<u>计划任务也是异步执行任务的一种方式，所以也需要参考之前的说明，为计划任务分配不同的队列。</u>
+
 在配置文件中，新增一项CELERYBEAT_SCHEDULE的配置
 
 ```python
@@ -251,3 +253,4 @@ schedule即配置计划任务的执行时间，例子中使用的是timedelta实
 | crontab(0, 0, day_of_month='1-7,15-21')                      | Execute on the first and third weeks of the month.           |
 | crontab(0, 0,day_of_month='11', month_of_year='5')           | Execute on the eleventh of May every year.                   |
 | crontab(0, 0, month_of_year='*/3')                           | Execute on the first month of every quarter.                 |
+

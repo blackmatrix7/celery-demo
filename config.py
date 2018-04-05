@@ -71,6 +71,7 @@ class CommonConfig(BaseConfig):
 class DefaultConfig(CommonConfig):
     pass
 
+
 default = DefaultConfig()
 
 configs = {

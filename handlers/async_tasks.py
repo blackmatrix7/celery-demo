@@ -24,7 +24,7 @@ def async_send_email(send_from, send_to, subject, content):
     :return:
     """
     logging.info('模拟异步发送邮件的操作')
-    # logging.info(send_from, send_to, subject, content)
+    logging.info(send_from, send_to, subject, content)
     # 休眠
     sleep(5)
 

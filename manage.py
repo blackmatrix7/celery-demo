@@ -87,10 +87,10 @@ if __name__ == '__main__':
     cmds = {
         # 启动celery
         'runcelery': runcelery,
+        # 启动celery beat
+        'runbeat': runbeat,
         # 根据task启动不同的worker
         'schedules': schedules,
         'push_message': push_message,
-        'send_email': send_email,
-        # 启动celery beat
-        'runbeat': runbeat,
-    }.get(cmdline.command, 'runcelery')()
+        'send_email': send_email
+    }.get(cmdline.command, runcelery)()

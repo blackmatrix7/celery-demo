@@ -7,6 +7,7 @@
 # @File : cmdline.py
 # @Software: PyCharm
 import sys
+
 __author__ = 'blackmatrix'
 
 
@@ -21,6 +22,7 @@ class CmdLine:
     def command(self):
         args = sys.argv
         return args[2] if len(args) >= 3 else 'runserver'
+
 
 cmdline = CmdLine()
 

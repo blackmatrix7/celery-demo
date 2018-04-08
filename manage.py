@@ -26,7 +26,7 @@ broker = current_config.CELERY_BROKER_URL
 celery_conf = {k: v for k, v in current_config.items()}
 
 # 创建celery实例
-celery = Celery('demo',  broker=broker)
+celery = Celery('demo', broker=broker)
 # 如果使用config模块，可以：
 # celery.config_from_object('config.current_config')
 # 使用dict的情况下，直接把dict作为参数传递给config_from_object
